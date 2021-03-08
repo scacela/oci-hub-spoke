@@ -1,0 +1,136 @@
+title: Hub-Spoke Stack
+description: "Deployment of network-related resources: VCN, Subnet, Route Table, Security List, Local Peering Gateway, Internet Gateway, Service Gateway, NAT Gateway, Dynamic Routing Gateway."
+schemaVersion: 1.0.0
+
+groupings:
+- title: "Hub"
+  variables: 
+  - ${region}
+  - ${hub_compartment_ocid}
+  - ${hub_name}
+  - ${hub_cidr}
+  - ${hub_num_network_partitions}
+  - ${hub_use_drg}
+  - ${client_premises_cidr}
+- title: "Spoke"
+  variables: 
+  - ${spoke_compartment_ocid}
+  - ${spoke_name}
+  - ${num_spokes}
+  - ${spoke_cidr_supernet}
+  - ${spoke_cidr_supernet_newbits}
+  - ${spoke_num_network_partitions}
+  - ${spoke_use_ngw}
+  - ${spoke_use_sgw}
+
+variables:
+  region:
+    type: string
+    required: true
+    description: "Region Identifier to specify the region in which the deployment will take place (e.g. us-phoenix-1)."
+    title: "Region"
+    visible: false
+
+  hub_compartment_ocid:
+    type: oci:identity:compartment:id
+    required: true
+    description: "Compartment OCID for Hub network."
+    title: "Hub Compartment"
+  hub_name:
+    type: string
+    required: true
+    description: "String to use as part of Hub network resources' display names"
+    title: "Hub Name"
+    default: hub
+  hub_cidr:
+    type: string
+    required: true
+    description: "Range of IP Addresses to use for the Hub Virtual Cloud Network (VCN). This value should not overlap with the value for \"Network Prefix to Supernet All Spoke VCN CIDRs\"."
+    title: "Hub CIDR"
+    default: 10.0.0.0/24
+  hub_num_network_partitions:
+    type: integer
+    required: true
+    description: "Number of partitions to divide the Hub VCN CIDR into. This will influence the size of each of the 2 subnets (1 X private + 1 X public). Should be a power of 2. Example A: if 2, the public subnet will occupt the first 1/2, and the private subnet will occupy the second 1/2. Example B: if 4, the public subnet will occupt the first 1/4, and the private subnet will occupy the second 1/4."
+    title: "Number of Network Partitions for Hub VCN"
+    default: 2
+    minimum: 2
+  hub_use_drg:
+    type: boolean
+    required: true
+    description: "Provision a Dynamic Routing Gateway (DRG) as part of the Hub network."
+    title: "Use DRG"
+    default: true
+  client_premises_cidr:
+    type: string
+    required: true
+    description: "The CIDR of customer premises. With configuration of IPSec VPN or FastConnect to the DRG, private connectivity between client premises and OCI can be established."
+    title: "Client Premises CIDR"
+    default: 172.1.0.0/16
+    visible: ${hub_use_drg}
+
+  spoke_compartment_ocid:
+    type: oci:identity:compartment:id
+    required: true
+    description: "Compartment OCID for Spoke network."
+    title: "Spoke Compartment"
+  num_spokes:
+    type: integer
+    required: true
+    description: "Number of Spoke VCNs to peer with the Hub VCN."
+    title: "Number of Spokes"
+    default: 2
+    minimum: 0
+  spoke_name:
+    type: string
+    required: true
+    description: "String to use as part of Spoke network resources' display names"
+    title: "Spoke Name"
+    default: student
+  spoke_cidr_supernet:
+    type: string
+    required: true
+    description: "Range of IP Addresses that serves as a network prefix for all Spoke Virtual Cloud Networks (VCNs). This value should not overlap with the value for Hub CIDR."
+    title: "Network Prefix to Supernet All Spoke VCN CIDRs" # when you change this string, change all occurrences in this file.
+    default: 10.1.0.0/16
+  spoke_cidr_supernet_newbits:
+    type: integer
+    required: true
+    description: "Number of new bits to add to the network prefix, \"Network Prefix to Supernet All Spoke VCN CIDRs\", to result in Spoke VCNs whose ranges are contained within this extension of the network prefix. E.g. extending a network prefix of 10.1.0.0/16 by 8 bits will result in Spoke VCNs of range, 10.1.X.0/24, where X is a different number for each Spoke VCN."
+    title: "New Bits"
+    default: 8
+  spoke_num_network_partitions:
+    type: enum
+    enum:
+    - 2 # this is the min number of partitions we can make in a VCN so that CIDR ranges can be defined for our minimum number of 2 subnets (1 X public + 1 X private) per VCN in this project.
+    - 4
+    - 8
+    - 16
+    - 32
+    - 64
+    - 128
+    - 256
+    - 512
+    - 1024
+    - 2048
+    - 4096
+    - 8192
+    - 16384
+    - 32768 # this is the max number of partitions we can make in a /16 VCN (largest VCN you can make in OCI) so that CIDR ranges can be defined for our minimum number of 2 subnets (1 X public + 1 X private) per VCN in this project.
+    required: true
+    description: "Number of partitions to divide the Spoke VCN CIDR into. This will influence the size of each of the 2 subnets (1 X private + 1 X public). Should be a power of 2. Example A: if 2, the public subnet will occupt the first 1/2, and the private subnet will occupy the second 1/2. Example B: if 4, the public subnet will occupt the first 1/4, and the private subnet will occupy the second 1/4."
+    title: "Number of Network Partitions for each Spoke VCN"
+    default: 2
+    minimum: 2
+  spoke_use_ngw:
+    type: boolean
+    required: true
+    description: "Provision a Network Address Translation Gateway (NGW) as part of each Spoke network. Provides outbound-only access from a network in OCI to the internet."
+    title: "Use NGW"
+    default: true
+  spoke_use_sgw:
+    type: boolean
+    required: true
+    description: "Provision a Service Gateway (SGW) as part of each Spoke network. Provides access to Oracle Services Network, which includes such services as Object Storage, Monitoring, Autonomous Database, etc."
+    title: "Use SGW"
+    default: true
