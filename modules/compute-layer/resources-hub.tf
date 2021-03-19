@@ -8,12 +8,11 @@ resource "oci_core_instance" "hub_pub_compute" {
     create_vnic_details {
         #Optional
         assign_public_ip = true
-        display_name = count.index > 1 ? "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}-${count.index+1}-vnic" : "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}-vnic"
-        hostname_label = count.index > 1 ? "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}-${count.index+1}" : "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}"
+        display_name = var.compute_hub_public_num_nodes == 1 ? "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}-${count.index+1}-vnic" : "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}-vnic"
+        hostname_label = var.compute_hub_public_num_nodes == 1 ? "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}-${count.index+1}" : "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}"
         subnet_id = var.deploy_network ? var.hub_pub_sub_ocid : var.hub_pub_sub_ocid
-        
     }
-    display_name = count.index > 1 ? "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}-${count.index+1}" : "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}"
+    display_name = var.compute_hub_public_num_nodes == 1 ? "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}-${count.index+1}" : "${local.region}-${var.compute_hub_name}-${local.public}-${local.compute_instance}"
     fault_domain = "FAULT-DOMAIN-${(count.index%3)+1}"
     dynamic shape_config {
         for_each = var.compute_hub_public_shape == "VM.Standard.E3.Flex" ? [1] : []
@@ -46,12 +45,11 @@ resource "oci_core_instance" "hub_priv_compute" {
     create_vnic_details {
         #Optional
         assign_public_ip = false
-        display_name = count.index > 1 ? "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}-${count.index+1}-vnic" : "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}-vnic"
-        hostname_label = count.index > 1 ? "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}-${count.index+1}" : "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}"
+        display_name = var.compute_hub_private_num_nodes > 1 ? "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}-${count.index+1}-vnic" : "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}-vnic"
+        hostname_label = var.compute_hub_private_num_nodes > 1 ? "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}-${count.index+1}" : "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}"
         subnet_id = var.deploy_network ? var.hub_priv_sub_ocid : var.hub_priv_sub_ocid
-        
     }
-    display_name = count.index > 1 ? "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}-${count.index+1}" : "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}"
+    display_name = var.compute_hub_private_num_nodes > 1 ? "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}-${count.index+1}" : "${local.region}-${var.compute_hub_name}-${local.private}-${local.compute_instance}"
     fault_domain = "FAULT-DOMAIN-${(count.index%3)+1}"
     dynamic shape_config {
         for_each = var.compute_hub_private_shape == "VM.Standard.E3.Flex" ? [1] : []

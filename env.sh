@@ -15,6 +15,6 @@ export TF_VAR_compute_spoke_public_compartment_ocid=COMPARTMENT_OCID # replace
 export TF_VAR_compute_spoke_private_compartment_ocid=COMPARTMENT_OCID # replace
 # ssh public keys
 export TF_VAR_compute_spoke_public_ssh_public_key=$(cat ~/.ssh/id_rsa.pub) # example
-export Tf_VAR_compute_spoke_private_ssh_public_key=$(cat ~/.ssh/id_rsa.pub) # example
+export TF_VAR_compute_spoke_private_ssh_public_key=$(cat ~/.ssh/id_rsa.pub) # example
 export TF_VAR_compute_hub_public_ssh_public_key=$(cat ~/.ssh/id_rsa.pub) # example
 export TF_VAR_compute_hub_private_ssh_public_key=$(cat ~/.ssh/id_rsa.pub) # example
