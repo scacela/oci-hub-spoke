@@ -14,7 +14,6 @@ resource "oci_core_local_peering_gateway" "network_spoke_to_network_hub_lpg" {
   display_name = "${local.region}-${var.network_name["spoke"]}-${count.index+1}-to-${var.network_name["hub"]}-${local.local_peering_gateway}"
   peer_id = oci_core_local_peering_gateway.network_hub_to_network_spoke_lpg[count.index].id
 }
-
 # rt
 resource "oci_core_route_table" "network_spoke_rt" {
   count =  var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1)
@@ -81,7 +80,6 @@ resource "oci_core_service_gateway" "network_spoke_sgw" {
   #Optional
   display_name = "${local.region}-${var.network_name["spoke"]}-${(count.index%var.num_spoke_networks)+1}-${local.service_gateway}"
 }
-
 # sl
 resource "oci_core_security_list" "network_spoke_sl" {
   count =  var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1)

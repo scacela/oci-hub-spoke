@@ -1,6 +1,10 @@
 # TO DO:
 # - conditions for deploy_network == false
 # - generate and output the ssh keys for each compute.
+# - cap the length of each custom name
+# - output the public ips of each hub instance
+# - create a host file of ips of all nodes on each hub instance
+# - update schema.yml
 
 # spoke compute
 resource "oci_core_instance" "spoke_compute" {
@@ -14,7 +18,6 @@ resource "oci_core_instance" "spoke_compute" {
         assign_public_ip = var.spoke_sub_are_private[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))] ? false : true
         display_name = "${replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance)}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}-vnic"
         hostname_label = "${replace(replace(replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance), "-", ""), local.region, "")}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}"
-        # all compute instances are assigned to subnet a
         subnet_id = var.spoke_sub_ocids[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))]
     }
     display_name = "${replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance)}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}"
