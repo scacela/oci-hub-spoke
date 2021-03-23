@@ -14,21 +14,23 @@ locals {
   nat_gateway = "ngw"
   local_peering_gateway = "lpg"
 }
+# add another subnet?
+variable "add_subnet" {}
+# subnet_is_public
+variable "subnet_is_public" {}
 # region
 variable "region" {}
 # hub variables
-variable "network_hub_compartment_ocid" {}
-variable "network_hub_name" {}
 variable "network_client_premises_cidr" {}
 variable "network_hub_use_drg" {}
 variable "network_hub_cidr" {}
-variable "network_hub_num_network_partitions" {}
 # spoke variables
-variable "network_spoke_compartment_ocid" {}
 variable "num_spoke_networks" {}
-variable "network_spoke_use_ngw" {}
 variable "network_spoke_use_sgw" {}
-variable "network_spoke_name" {}
 variable "network_spoke_cidr_supernet" {}
 variable "network_spoke_cidr_supernet_newbits" {}
-variable "network_spoke_num_network_partitions" {}
+# common variables
+variable "network_compartment_ocid" {}
+variable "network_name" {}
+variable "network_num_network_partitions" {}
+variable "network_use_ngw" {}

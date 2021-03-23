@@ -5,12 +5,15 @@ locals {
   private = "priv"
   public = "pub"
   compute_instance = "compute"
+  subnet = "sub"
 }
 # outputs from network module
-variable "hub_pub_sub_ocid" {}
-variable "hub_priv_sub_ocid" {}
-variable "spoke_pub_sub_ocids" {}
-variable "spoke_priv_sub_ocids" {}
+variable "hub_sub_ocids" {}
+variable "hub_sub_display_names" {}
+variable "hub_sub_are_private" {}
+variable "spoke_sub_ocids" {}
+variable "spoke_sub_display_names" {}
+variable "spoke_sub_are_private" {}
 # tenancy
 variable "tenancy_ocid" {}
 # region
@@ -19,51 +22,19 @@ variable "region" {}
 variable "num_spoke_networks" {}
 # deploy network?
 variable "deploy_network" {}
-# hub variables
-variable "compute_hub_name" {}
-  # public
-variable "compute_hub_public_availability_domain" {}
-variable "compute_hub_public_compartment_ocid" {}
-variable "compute_hub_public_shape" {}
-variable "compute_hub_public_shape_config_memory_in_gbs" {}
-variable "compute_hub_public_shape_config_ocpus" {}
-variable "compute_hub_public_image_ocid" {}
-variable "compute_hub_public_boot_volume_size_in_gbs" {}
-# variable "compute_hub_public_existing_subnet_ocid" {}
-variable "compute_hub_public_num_nodes" {}
-variable "compute_hub_public_ssh_public_key" {}
-  # private
-variable "compute_hub_private_availability_domain" {}
-variable "compute_hub_private_compartment_ocid" {}
-variable "compute_hub_private_shape" {}
-variable "compute_hub_private_shape_config_memory_in_gbs" {}
-variable "compute_hub_private_shape_config_ocpus" {}
-variable "compute_hub_private_image_ocid" {}
-variable "compute_hub_private_boot_volume_size_in_gbs" {}
-# variable "compute_hub_private_existing_subnet_ocid" {}
-variable "compute_hub_private_num_nodes" {}
-variable "compute_hub_private_ssh_public_key" {}
-# spoke variables
-variable "compute_spoke_name" { default = "student" }
-  # public
-variable "compute_spoke_public_availability_domain" {}
-variable "compute_spoke_public_compartment_ocid" {}
-variable "compute_spoke_public_shape" {}
-variable "compute_spoke_public_shape_config_memory_in_gbs" {}
-variable "compute_spoke_public_shape_config_ocpus" {}
-variable "compute_spoke_public_image_ocid" {}
-variable "compute_spoke_public_boot_volume_size_in_gbs" {}
-# variable "compute_spoke_public_existing_subnet_ocid" {}
-variable "compute_spoke_public_num_nodes" {}
-variable "compute_spoke_public_ssh_public_key" {}
-  # private
-variable "compute_spoke_private_availability_domain" {}
-variable "compute_spoke_private_compartment_ocid" {}
-variable "compute_spoke_private_shape" {}
-variable "compute_spoke_private_shape_config_memory_in_gbs" {}
-variable "compute_spoke_private_shape_config_ocpus" {}
-variable "compute_spoke_private_image_ocid" {}
-variable "compute_spoke_private_boot_volume_size_in_gbs" {}
-# variable "compute_spoke_private_existing_subnet_ocid" {}
-variable "compute_spoke_private_num_nodes" {}
-variable "compute_spoke_private_ssh_public_key" {}
+# add another subnet?
+variable "add_subnet" {}
+# subnet_is_public
+variable "subnet_is_public" {}
+# common variables
+variable "network_name" {}
+variable "compute_name" {}
+variable "compute_availability_domain" {}
+variable "compute_compartment_ocid" {}
+variable "compute_shape" {}
+variable "compute_shape_config_memory_in_gbs" {}
+variable "compute_shape_config_ocpus" {}
+variable "compute_image_ocid" {}
+variable "compute_boot_volume_size_in_gbs" {}
+variable "compute_num_nodes" {}
+variable "compute_ssh_key" {}
