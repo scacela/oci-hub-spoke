@@ -1,2 +1,2 @@
-# oci-hub-spoke-network-layer
-Deploy and manage the network layer of a hub-spoke topology using Terraform
+# oci-hub-spoke
+Deploy and manage the network and compute layers of a hub-spoke topology using Terraform
