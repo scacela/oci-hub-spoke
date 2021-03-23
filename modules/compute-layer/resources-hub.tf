@@ -10,7 +10,6 @@ resource "oci_core_instance" "hub_compute" {
         assign_public_ip = var.hub_sub_are_private[count.index%(var.add_subnet["hub"] ? 2 : 1)] ? false : true
         display_name = "${replace(replace(var.hub_sub_display_names[count.index%(var.add_subnet["hub"] ? 2 : 1)], var.network_name["hub"], var.compute_name["hub"]), local.subnet, local.compute_instance)}${var.compute_num_nodes["hub"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["hub"] ? 2 : 1))%var.compute_num_nodes["hub"])+1)) : ""}-vnic"
         hostname_label = "${replace(replace(replace(replace(var.hub_sub_display_names[count.index%(var.add_subnet["hub"] ? 2 : 1)], var.network_name["hub"], var.compute_name["hub"]), local.subnet, local.compute_instance), "-", ""), local.region, "")}${var.compute_num_nodes["hub"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["hub"] ? 2 : 1))%var.compute_num_nodes["hub"])+1)) : ""}"
-        # all compute instances are assigned to subnet a
         subnet_id = var.hub_sub_ocids[count.index%(var.add_subnet["hub"] ? 2 : 1)]
     }
     display_name = "${replace(replace(var.hub_sub_display_names[count.index%(var.add_subnet["hub"] ? 2 : 1)], var.network_name["hub"], var.compute_name["hub"]), local.subnet, local.compute_instance)}${var.compute_num_nodes["hub"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["hub"] ? 2 : 1))%var.compute_num_nodes["hub"])+1)) : ""}"
