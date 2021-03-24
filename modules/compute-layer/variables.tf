@@ -6,6 +6,7 @@ locals {
   public = "pub"
   compute_instance = "compute"
   subnet = "sub"
+  ssh_keys_directory = "${path.root}/keys"
 }
 # outputs from network module
 variable "hub_sub_ocids" {}

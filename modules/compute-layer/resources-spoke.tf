@@ -1,11 +1,3 @@
-# TO DO:
-# - conditions for deploy_network == false
-# - generate and output the ssh keys for each compute.
-# - cap the length of each custom name
-# - output the public ips of each hub instance
-# - create a host file of ips of all nodes on each hub instance
-# - update schema.yml
-
 # spoke compute
 resource "oci_core_instance" "spoke_compute" {
     count = var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1) * var.compute_num_nodes["spoke"]
@@ -16,11 +8,11 @@ resource "oci_core_instance" "spoke_compute" {
     create_vnic_details {
         #Optional
         assign_public_ip = var.spoke_sub_are_private[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))] ? false : true
-        display_name = "${replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance)}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}-vnic"
+        display_name = "${replace(replace(replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance), "-", ""), local.region, "")}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}-vnic"
         hostname_label = "${replace(replace(replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance), "-", ""), local.region, "")}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}"
         subnet_id = var.spoke_sub_ocids[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))]
     }
-    display_name = "${replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance)}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}"
+    display_name = "${replace(replace(replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance), "-", ""), local.region, "")}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}"
     fault_domain = "FAULT-DOMAIN-${(count.index%3)+1}"
     dynamic shape_config {
         for_each = var.compute_shape["spoke"] == "VM.Standard.E3.Flex" ? [1] : []
@@ -38,8 +30,25 @@ resource "oci_core_instance" "spoke_compute" {
         boot_volume_size_in_gbs = var.compute_boot_volume_size_in_gbs["spoke"]
         # kms_key_id = oci_kms_key.test_key.id
     }
+    # metadata = {
+    #     ssh_authorized_keys = var.compute_ssh_key["spoke"]
+    # }
     metadata = {
-        ssh_authorized_keys = var.compute_ssh_key["spoke"]
+        ssh_authorized_keys = tls_private_key.spoke_key[count.index].public_key_openssh
     }
     preserve_boot_volume = false
+}
+# private ssh key
+resource "tls_private_key" "spoke_key" {
+    count = var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1) * var.compute_num_nodes["spoke"]
+    algorithm = "RSA"
+}
+# private ssh key file
+resource "local_file" "spoke_key_file" {
+    count = var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1) * var.compute_num_nodes["spoke"]
+    filename = "${local.ssh_keys_directory}/${replace(replace(replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance), "-", ""), local.region, "")}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}.pem"
+    content  = tls_private_key.spoke_key[count.index].private_key_pem
+    provisioner "local-exec" {
+        command = "chmod 600 ${local.ssh_keys_directory}/${replace(replace(replace(replace(var.spoke_sub_display_names[count.index%(var.num_spoke_networks * (var.add_subnet["spoke"] ? 2 : 1))], var.network_name["spoke"], var.compute_name["spoke"]), local.subnet, local.compute_instance), "-", ""), local.region, "")}${var.compute_num_nodes["spoke"] > 1 ? format("-%s", floor(((count.index/(var.add_subnet["spoke"] ? 2 : 1))%var.compute_num_nodes["spoke"])+1)) : ""}.pem"
+    }
 }
