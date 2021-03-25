@@ -54,6 +54,7 @@ resource "local_file" "hub_key_file" {
 }
 # hosts file gets deployed to hub computes
 resource "null_resource" "hub_host_file" {
+    # depends_on = [oci_core_instance.hub_compute] # might be necessary for case when deployed to new network, then re-deployed with deploy_network == false to an existing subnet. This depends_on could make the difference between the hosts file being deployed vs. not to the new compute.
     count = (var.add_subnet["hub"] ? 2 : 1) * var.compute_num_nodes["hub"]
     provisioner "file" {
     content = templatefile("${path.module}/hosts.tpl", {

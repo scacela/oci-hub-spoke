@@ -13,9 +13,8 @@ variableGroups:
 - title: "Network Layer"
   variables:
   - ${deploy_network}
-- title: "Hub"
-  variables: 
   # depend on deploy network
+  # hub
   - ${network_hub_compartment_ocid}
   - ${network_hub_name}
   - ${network_hub_cidr}
@@ -25,9 +24,7 @@ variableGroups:
   - ${network_client_premises_cidr} # depends on use drg
   - ${hub_add_subnet}
   - ${hub_subnet_b_is_public} # depends on add subnet
-- title: "Spoke"
-  variables:
-  # depend on deploy network
+  # spoke
   - ${num_spoke_networks}
   - ${network_spoke_compartment_ocid}
   - ${network_spoke_name}
@@ -42,9 +39,8 @@ variableGroups:
 - title: "Compute Layer"
   variables:
   - ${deploy_compute}
-- title: "Hub"
-  variables:
     # depend on deploy compute
+    # hub
   - ${compute_hub_name}
   - ${compute_hub_availability_domain}
   - ${compute_hub_compartment_ocid}
@@ -55,9 +51,7 @@ variableGroups:
   - ${compute_hub_boot_volume_size_in_gbs}
   - ${compute_hub_existing_subnet_ocid} # depends on (not) deploy network
   - ${compute_hub_num_nodes}
-- title: "Spoke"
-  variables:
-    # depend on deploy compute
+  # spoke
   - ${compute_spoke_name}
   - ${compute_spoke_availability_domain}
   - ${compute_spoke_compartment_ocid}
@@ -98,6 +92,7 @@ variables:
     description: "Deploy hub network in which compartment?"
     title: "Hub Compartment"
     visible: ${deploy_network}
+    default: samuel
   network_hub_name:
     type: string
     required: true
@@ -150,8 +145,7 @@ variables:
     description: "Deploy an additional subnet within the hub VCN?"
     title: "Hub Add Subnet"
     default: true
-    visible:
-      and: ${deploy_network}
+    visible: ${deploy_network}
   hub_subnet_b_is_public:
     type: boolean
     required: true
@@ -176,6 +170,7 @@ variables:
     description: "Deploy spoke network in which compartment?"
     title: "Spoke Compartment"
     visible: ${deploy_network}
+    default: samuel
   network_spoke_name:
     type: string
     required: true
@@ -249,8 +244,7 @@ variables:
     description: "Deploy an additional subnet within the hub VCN?"
     title: "Spoke Add Subnet"
     default: true
-    visible:
-      and: ${deploy_network}
+    visible: ${deploy_network}
   spoke_subnet_b_is_public:
     type: boolean
     required: true
@@ -292,6 +286,7 @@ variables:
     description: "Compartment OCID for each hub compute instance."
     title: "Hub Compartment"
     visible: ${deploy_compute}
+    default: samuel
   compute_hub_shape:
     type: enum
     enum:
@@ -315,28 +310,30 @@ variables:
     required: true
     description: "Amount of memory in GiB for each Hub compute instance."
     title: "Hub Memory"
-    default: 256
+    default: 16
     maximum: 1024
     minimum: 1
     visible:
       and:
         - eq:
           - ${compute_hub_shape}
-          - "VM.Standard.E3.Flex"
-          - "VM.Standard.E4.Flex"
+          or:
+            - "VM.Standard.E3.Flex"
+            - "VM.Standard.E4.Flex"
         - ${deploy_compute}
   compute_hub_shape_config_ocpus:
     type: integer
     required: true
     description: "Number of OCPUs for hub compute instances."
     title: "Hub Number of OCPUs"
-    default: 32
+    default: 1
     maximum: 64
     minimum: 1
     visible:
       and:
           - eq:
             - ${compute_hub_shape}
+            or:
             - "VM.Standard.E3.Flex"
             - "VM.Standard.E4.Flex"
           - and:
@@ -383,7 +380,7 @@ variables:
     required: true
     description: "Friendly string to include in spoke compute-layer resources' names."
     title: "Spoke Name"
-    default: jumpserver
+    default: student
     visible: ${deploy_compute}
   compute_spoke_availability_domain:
     type: enum
@@ -401,6 +398,7 @@ variables:
     description: "Compartment OCID for each spoke compute instance."
     title: "Spoke Compartment"
     visible: ${deploy_compute}
+    default: samuel
   compute_spoke_shape:
     type: enum
     enum:
@@ -424,28 +422,30 @@ variables:
     required: true
     description: "Amount of memory in GiB for each Spoke compute instance."
     title: "Spoke Memory"
-    default: 256
+    default: 16
     maximum: 1024
     minimum: 1
     visible:
       and:
         - eq:
           - ${compute_spoke_shape}
-          - "VM.Standard.E3.Flex"
-          - "VM.Standard.E4.Flex"
+          or:
+            - "VM.Standard.E3.Flex"
+            - "VM.Standard.E4.Flex"
         - ${deploy_compute}
   compute_spoke_shape_config_ocpus:
     type: integer
     required: true
     description: "Number of OCPUs for spoke compute instances."
     title: "Spoke Number of OCPUs"
-    default: 32
+    default: 1
     maximum: 64
     minimum: 1
     visible:
       and:
           - eq:
             - ${compute_spoke_shape}
+            or:
             - "VM.Standard.E3.Flex"
             - "VM.Standard.E4.Flex"
           - and:

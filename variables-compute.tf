@@ -15,7 +15,7 @@ variable "compute_hub_shape_config_memory_in_gbs" { default = 16 }
 variable "compute_hub_shape_config_ocpus" { default = 1 }
 variable "compute_hub_image_ocid" { default = "ocid1.image.oc1..aaaaaaaatmfegrt4uzjgmcemh3vrk46f7ileqcfohhas56hi3pnjhp4nfhoq" }
 variable "compute_hub_boot_volume_size_in_gbs" { default = 64 }
-variable "compute_hub_existing_subnet_ocid" {}
+variable "compute_hub_existing_subnet_ocid" { default = "" }
 variable "compute_hub_num_nodes" { default = 2 }
 # spoke
 variable "compute_spoke_name" { default = "student" }
@@ -26,7 +26,7 @@ variable "compute_spoke_shape_config_memory_in_gbs" { default = 16 }
 variable "compute_spoke_shape_config_ocpus" { default = 1 }
 variable "compute_spoke_image_ocid" { default = "ocid1.image.oc1..aaaaaaaatmfegrt4uzjgmcemh3vrk46f7ileqcfohhas56hi3pnjhp4nfhoq" }
 variable "compute_spoke_boot_volume_size_in_gbs" { default = 64 }
-variable "compute_spoke_existing_subnet_ocid" {}
+variable "compute_spoke_existing_subnet_ocid" { default = "" }
 variable "compute_spoke_num_nodes" { default = 2 }
 
 locals {
