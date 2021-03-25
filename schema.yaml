@@ -10,83 +10,66 @@ variableGroups:
   variables:
   - ${tenancy_ocid}
   - ${region}
-- title: "Network"
+- title: "Network Layer"
   variables:
   - ${deploy_network}
-- title: "Hub Network"
+- title: "Hub"
   variables: 
+  # depend on deploy network
   - ${network_hub_compartment_ocid}
   - ${network_hub_name}
   - ${network_hub_cidr}
   - ${network_hub_num_network_partitions}
+  - ${network_hub_use_ngw}
   - ${network_hub_use_drg}
-  - ${network_client_premises_cidr}
-- title: "Spoke Network"
-  variables: 
+  - ${network_client_premises_cidr} # depends on use drg
+  - ${hub_add_subnet}
+  - ${hub_subnet_b_is_public} # depends on add subnet
+- title: "Spoke"
+  variables:
+  # depend on deploy network
+  - ${num_spoke_networks}
   - ${network_spoke_compartment_ocid}
   - ${network_spoke_name}
-  - ${num_spoke_networks}
   - ${network_spoke_cidr_supernet}
   - ${network_spoke_cidr_supernet_newbits}
   - ${network_spoke_num_network_partitions}
   - ${network_spoke_use_ngw}
   - ${network_spoke_use_sgw}
-- title: "Compute"
+  - ${spoke_subnet_a_is_public}
+  - ${spoke_add_subnet}
+  - ${spoke_subnet_b_is_public} # depends on add subnet
+- title: "Compute Layer"
   variables:
   - ${deploy_compute}
-- title: "Hub Compute"
+- title: "Hub"
   variables:
-  # hub variables
+    # depend on deploy compute
   - ${compute_hub_name}
-    # public
   - ${compute_hub_availability_domain}
   - ${compute_hub_compartment_ocid}
   - ${compute_hub_shape}
-  - ${compute_hub_shape_config_memory_in_gbs}
-  - ${compute_hub_shape_config_ocpus}
+  - ${compute_hub_shape_config_memory_in_gbs} # depends on shape
+  - ${compute_hub_shape_config_ocpus} # depends on shape
   - ${compute_hub_image_ocid}
   - ${compute_hub_boot_volume_size_in_gbs}
-  - ${compute_hub_existing_subnet_ocid}
+  - ${compute_hub_existing_subnet_ocid} # depends on (not) deploy network
   - ${compute_hub_num_nodes}
-  - ${compute_hub_ssh_key}
-    # private
-
-
-
-
-
-
-
-
-
-
-- title: "Spoke Compute"
+- title: "Spoke"
   variables:
-  # spoke variables
-  - ${compute__name}
-    # public
-  - ${compute__availability_domain}
-  - ${compute__compartment_ocid}
-  - ${compute__shape}
-  - ${compute__shape_config_memory_in_gbs}
-  - ${compute__shape_config_ocpus}
-  - ${compute__image_ocid}
-  - ${compute__boot_volume_size_in_gbs}
-  - ${compute__existing_subnet_ocid}
-  - ${compute__num_nodes}
-  - ${compute__ssh_key}
-    # private
+    # depend on deploy compute
+  - ${compute_spoke_name}
+  - ${compute_spoke_availability_domain}
+  - ${compute_spoke_compartment_ocid}
+  - ${compute_spoke_shape}
+  - ${compute_spoke_shape_config_memory_in_gbs} # depends on shape
+  - ${compute_spoke_shape_config_ocpus} # depends on shape
+  - ${compute_spoke_image_ocid}
+  - ${compute_spoke_boot_volume_size_in_gbs}
+  - ${compute_spoke_existing_subnet_ocid}
+  - ${compute_spoke_num_nodes}
 
-
-
-
-
-
-
-
-
-
-
+# invisible variables
 variables:
   tenancy_ocid:
     type: string
@@ -100,92 +83,117 @@ variables:
     description: "Region Identifier to specify the region in which the deployment will take place (e.g. us-phoenix-1)."
     title: "Region"
     visible: false
-# deploy network
+
+# network layer
   deploy_network:
     type: boolean
     required: true
-    description: "Deploy the network layer of the hub-spoke topology?"
-    title: "Deploy Network"
+    description: "Deploy the network layer of the hub-and-spoke topology?"
+    title: "Deploy Network Layer"
     default: true
-# hub network
+# hub
   network_hub_compartment_ocid:
     type: oci:identity:compartment:id
     required: true
-    description: "Compartment OCID for Hub network."
+    description: "Deploy hub network in which compartment?"
     title: "Hub Compartment"
     visible: ${deploy_network}
   network_hub_name:
     type: string
     required: true
-    description: "String to use as part of Hub network resources' display names"
+    description: "Friendly string to include in hub network-layer resources' names."
     title: "Hub Name"
     default: hub
     visible: ${deploy_network}
   network_hub_cidr:
     type: string
     required: true
-    description: "Range of IP Addresses to use for the Hub Virtual Cloud Network (VCN). This value should not overlap with the value for \"Network Prefix to Supernet All Spoke VCN CIDRs\"."
+    description: "Range of IP addresses to use for the hub Virtual Cloud Network (VCN). This value should not overlap with the value for \"Network Prefix to Supernet All Spoke VCN CIDRs\"."
     title: "Hub CIDR"
     default: 10.0.0.0/24
     visible: ${deploy_network}
   network_hub_num_network_partitions:
     type: integer
     required: true
-    description: "Number of partitions to divide the Hub VCN CIDR into. This will influence the size of each of the 2 subnets (1 X private + 1 X public). Should be a power of 2. Example A: if 2, the public subnet will occupt the first 1/2, and the private subnet will occupy the second 1/2. Example B: if 4, the public subnet will occupt the first 1/4, and the private subnet will occupy the second 1/4."
+    description: "Number of partitions to divide the hub VCN CIDR into. This will influence the size of any subnets deployed in the hub VCN."
     title: "Number of Network Partitions for Hub VCN"
     default: 2
     minimum: 2
+    visible: ${deploy_network}
+  network_hub_use_ngw:
+    type: boolean
+    required: true
+    description: "Provision a Network Address Translation Gateway (NAT GW or NGW) as part of each hub network. Provides outbound-only access from a network in OCI to the internet."
+    title: "Hub Use NGW"
+    default: true
     visible: ${deploy_network}
   network_hub_use_drg:
     type: boolean
     required: true
     description: "Provision a Dynamic Routing Gateway (DRG) as part of the Hub network."
-    title: "Use DRG"
+    title: "Hub Use DRG"
     default: true
     visible: ${deploy_network}
   network_client_premises_cidr:
     type: string
     required: true
-    description: "The CIDR of customer premises. With configuration of IPSec VPN or FastConnect to the DRG, private connectivity between client premises and OCI can be established."
+    description: "The CIDR of customer premises. With configuration of IPSec VPN or FastConnect to the DRG (not included in this stack), private connectivity between client premises and OCI can be established."
     title: "Client Premises CIDR"
     default: 172.1.0.0/16
     visible:
       and:
         - ${network_hub_use_drg}
         - ${deploy_network}
-# spoke network
-  network_spoke_compartment_ocid:
-    type: oci:identity:compartment:id
+  hub_add_subnet:
+    type: boolean
     required: true
-    description: "Compartment OCID for Spoke network."
-    title: "Spoke Compartment"
-    visible: ${deploy_network}
+    description: "Deploy an additional subnet within the hub VCN?"
+    title: "Hub Add Subnet"
+    default: true
+    visible:
+      and: ${deploy_network}
+  hub_subnet_b_is_public:
+    type: boolean
+    required: true
+    description: "Will the additional subnet in the hub VCN allow public IPs?"
+    title: "Allow Public IPs in Additional Hub Subnet"
+    visible:
+      and:
+        - ${deploy_network}
+        - ${hub_add_subnet}
+# spoke network
   num_spoke_networks:
     type: integer
     required: true
-    description: "Number of Spoke VCNs to peer with the Hub VCN."
+    description: "How many spoke VCNs will be deployed in this hub-and-spoke stack?"
     title: "Number of Spokes"
     default: 2
     minimum: 0
     visible: ${deploy_network}
+  network_spoke_compartment_ocid:
+    type: oci:identity:compartment:id
+    required: true
+    description: "Deploy spoke network in which compartment?"
+    title: "Spoke Compartment"
+    visible: ${deploy_network}
   network_spoke_name:
     type: string
     required: true
-    description: "String to use as part of Spoke network resources' display names"
+    description: "Friendly string to include in hub network-layer resources' names."
     title: "Spoke Name"
     default: student
     visible: ${deploy_network}
   network_spoke_cidr_supernet:
     type: string
     required: true
-    description: "Range of IP Addresses that serves as a network prefix for all Spoke Virtual Cloud Networks (VCNs). This value should not overlap with the value for Hub CIDR."
+    description: "Range of IP Addresses that serves as a network prefix for all spoke Virtual Cloud Networks (VCNs). This value should not overlap with the value for \"Hub CIDR\"."
     title: "Network Prefix to Supernet All Spoke VCN CIDRs" # when you change this string, change all occurrences in this file.
     default: 10.1.0.0/16
     visible: ${deploy_network}
   network_spoke_cidr_supernet_newbits:
     type: integer
     required: true
-    description: "Number of new bits to add to the network prefix, \"Network Prefix to Supernet All Spoke VCN CIDRs\", to result in Spoke VCNs whose ranges are contained within this extension of the network prefix. E.g. extending a network prefix of 10.1.0.0/16 by 8 bits will result in Spoke VCNs of range, 10.1.X.0/24, where X is a different number for each Spoke VCN."
+    description: "Number of new bits to add to the network prefix, \"Network Prefix to Supernet All Spoke VCN CIDRs\", to result in spoke VCNs whose ranges are contained within this extension of the network prefix. E.g. extending a network prefix of 10.1.0.0/16 by 8 bits will result in spoke VCNs of range 10.1.X.0/24, such that: spoke 1: 10.1.0.0/24, spoke 2: 10.1.1.0/24, etc."
     title: "New Bits"
     default: 8
     visible: ${deploy_network}
@@ -208,7 +216,7 @@ variables:
     - 16384
     - 32768 # this is the max number of partitions we can make in a /16 VCN (largest VCN you can make in OCI) so that CIDR ranges can be defined for our minimum number of 2 subnets (1 X public + 1 X private) per VCN in this project.
     required: true
-    description: "Number of partitions to divide the Spoke VCN CIDR into. This will influence the size of each of the 2 subnets (1 X private + 1 X public). Should be a power of 2. Example A: if 2, the public subnet will occupt the first 1/2, and the private subnet will occupy the second 1/2. Example B: if 4, the public subnet will occupt the first 1/4, and the private subnet will occupy the second 1/4."
+    description: "Number of partitions to divide each spoke VCN CIDR into. This will influence the size of any subnets deployed in each spoke VCN."
     title: "Number of Network Partitions for each Spoke VCN"
     default: 2
     minimum: 2
@@ -216,34 +224,58 @@ variables:
   network_spoke_use_ngw:
     type: boolean
     required: true
-    description: "Provision a Network Address Translation Gateway (NGW) as part of each Spoke network. Provides outbound-only access from a network in OCI to the internet."
-    title: "Use NGW"
+    description: "Provision a Network Address Translation Gateway (NAT GW or NGW) as part of each spoke network. Provides outbound-only access from a network in OCI to the internet."
+    title: "Spoke Use NGW"
     default: true
     visible: ${deploy_network}
   network_spoke_use_sgw:
     type: boolean
     required: true
     description: "Provision a Service Gateway (SGW) as part of each Spoke network. Provides access to Oracle Services Network, which includes such services as Object Storage, Monitoring, Autonomous Database, etc."
-    title: "Use SGW"
+    title: "Spoke Use SGW"
     default: true
     visible: ${deploy_network}
+  spoke_subnet_a_is_public:
+    type: boolean
+    required: true
+    description: "Will the subnet in the spoke VCN allow public IPs?"
+    title: "Allow Public IPs in Spoke Subnet"
+    visible:
+      and:
+        - ${deploy_network}
+  spoke_add_subnet:
+    type: boolean
+    required: true
+    description: "Deploy an additional subnet within the hub VCN?"
+    title: "Spoke Add Subnet"
+    default: true
+    visible:
+      and: ${deploy_network}
+  spoke_subnet_b_is_public:
+    type: boolean
+    required: true
+    description: "Will the additional subnet in the spoke VCN allow public IPs?"
+    title: "Allow Public IPs in Additional Spoke Subnet"
+    visible:
+      and:
+        - ${deploy_network}
+        - ${spoke_add_subnet}
 
 # deploy compute
   deploy_compute:
     type: boolean
     required: true
-    description: "Deploy the compute layer of the hub-spoke topology?"
-    title: "Deploy Compute"
+    description: "Deploy the compute layer of the hub-and-spoke topology?"
+    title: "Deploy Compute Layer"
     default: true
-# hub compute
+# hub
   compute_hub_name:
     type: string
     required: true
-    description: "String to use as part of Hub compute resources' display names"
+    description: "Friendly string to include in hub compute-layer resources' names."
     title: "Hub Name"
     default: jumpserver
     visible: ${deploy_compute}
-  # public
   compute_hub_availability_domain:
     type: enum
     enum:
@@ -251,14 +283,14 @@ variables:
       - 2
       - 3
     required: true
-    description: "Availability Domain for Hub public compute."
-    title: "Hub AD - Public"
+    description: "Availability Domain (AD) for each hub compute instance."
+    title: "Hub AD"
     visible: ${deploy_compute}
   compute_hub_compartment_ocid:
     type: oci:identity:compartment:id
     required: true
-    description: "Compartment OCID for Hub public compute."
-    title: "Hub Compartment - Hub, Public"
+    description: "Compartment OCID for each hub compute instance."
+    title: "Hub Compartment"
     visible: ${deploy_compute}
   compute_hub_shape:
     type: enum
@@ -270,18 +302,19 @@ variables:
       - "VM.Standard2.16"
       - "VM.Standard2.24"
       - "VM.Standard.E3.Flex"
+      - "VM.Standard.E4.Flex"
       - "BM.Standard2.52"
       - "BM.HPC2.36"
     required: true
-    description: "\"Weight class\" (e.g. CPUs, amount of memory, etc.) of your Hub public compute."
-    title: "Hub Shape - Hub, Public"
+    description: "Template that specifies the amount of resources (e.g. CPUs, amount of memory, etc.) that are assigned to each hub compute instance."
+    title: "Hub Shape"
     default: "VM.Standard2.1"
     visible: ${deploy_compute}
   compute_hub_shape_config_memory_in_gbs:
     type: integer
     required: true
-    description: "Amount of memory in GiB for Hub public compute. Customizable for flex shapes."
-    title: "Memory - Hub, Public"
+    description: "Amount of memory in GiB for each Hub compute instance."
+    title: "Hub Memory"
     default: 256
     maximum: 1024
     minimum: 1
@@ -290,12 +323,13 @@ variables:
         - eq:
           - ${compute_hub_shape}
           - "VM.Standard.E3.Flex"
+          - "VM.Standard.E4.Flex"
         - ${deploy_compute}
   compute_hub_shape_config_ocpus:
     type: integer
     required: true
-    description: "Number of OCPUs for Hub public compute. Customizable for flex shapes."
-    title: "Number of OCPUs - Hub, Public"
+    description: "Number of OCPUs for hub compute instances."
+    title: "Hub Number of OCPUs"
     default: 32
     maximum: 64
     minimum: 1
@@ -304,19 +338,20 @@ variables:
           - eq:
             - ${compute_hub_shape}
             - "VM.Standard.E3.Flex"
+            - "VM.Standard.E4.Flex"
           - and:
             - ${deploy_compute}
   compute_hub_image_ocid:
     type: string
     required: true
-    description: "Virtual hard drive template for Hub public compute. Determines the operating system and other software for the machine."
+    description: "Oracle Cloud Identifier (OCID) that corresponds to a virtual hard drive template for hub compute instances. Determines the operating system and other software for the machine. These OCIDs are typically region-specific."
     visible: ${deploy_compute}
-    default: ocid1.image.oc1.uk-london-1.aaaaaaaakpa2zlibtjh5nrpaewb75k7pl3cy6oibq3hz7psm26uuiok56sfa
+    default: ocid1.image.oc1..aaaaaaaatmfegrt4uzjgmcemh3vrk46f7ileqcfohhas56hi3pnjhp4nfhoq
   compute_hub_boot_volume_size_in_gbs:
     type: integer
     required: true
-    description: "Boot Volume size in GiB for Hub public compute."
-    title: "Boot Volume Size - Hub, Public"
+    description: "Boot Volume size in GiB for hub compute instances."
+    title: "Hub Boot Volume Size"
     default: 64
     maximum: 16384
     minimum: 50
@@ -324,8 +359,8 @@ variables:
   compute_hub_existing_subnet_ocid:
     type: string
     required: true
-    description: "Subnet OCID for Hub public compute."
-    title: "Subnet OCID - Hub, Public"
+    description: "OCID that corresponds to an existing subnet in which hub compute instances will be deployed."
+    title: "Hub Existing Subnet"
     visible:
       and:
         - not: 
@@ -337,141 +372,36 @@ variables:
   compute_hub_num_nodes:
     type: integer
     required: true
-    description: "Number of nodes for Hub public compute."
-    title: "Number of Nodes - Hub, Public"
+    description: "How many compute instances will be deployed in each subnet of the hub VCN?."
+    title: "Hub Number of Nodes per Subnet"
     default: 1
     minimum: 0
     visible: ${deploy_compute}
-  compute_hub_ssh_key:
-    type: oci:core:ssh:publickey
-    required: true
-    description: "SSH public key for Hub public compute."
-    title: "SSH Public Key - Hub, Public"
-    visible: ${deploy_compute}
-    # private
-
-    type: enum
-    enum:
-      - 1
-      - 2
-      - 3
-    required: true
-    description: "Availability Domain for Hub private compute."
-    title: "Hub AD - Private"
-    visible: ${deploy_compute}
-
-    type: oci:identity:compartment:id
-    required: true
-    description: "Compartment OCID for Hub private compute."
-    title: "Hub Compartment - Hub, Private"
-    visible: ${deploy_compute}
-
-    type: enum
-    enum:
-      - "VM.Standard2.1"
-      - "VM.Standard2.2"
-      - "VM.Standard2.4"
-      - "VM.Standard2.8"
-      - "VM.Standard2.16"
-      - "VM.Standard2.24"
-      - "VM.Standard.E3.Flex"
-      - "BM.Standard2.52"
-      - "BM.HPC2.36"
-    required: true
-    description: "\"Weight class\" (e.g. CPUs, amount of memory, etc.) of your Hub private compute."
-    title: "Hub Shape - Hub, Private"
-    default: "VM.Standard2.1"
-    visible: ${deploy_compute}
-
-    type: integer
-    required: true
-    description: "Amount of memory in GiB for Hub private compute. Customizable for flex shapes."
-    title: "Memory - Hub, Private"
-    default: 256
-    maximum: 1024
-    minimum: 1
-    visible:
-      and:
-        - eq:
-
-          - "VM.Standard.E3.Flex"
-        - and:
-          - ${deploy_compute}
-
-    type: integer
-    required: true
-    description: "Number of OCPUs for Hub private compute. Customizable for flex shapes."
-    title: "Number of OCPUs - Hub, Private"
-    default: 32
-    maximum: 64
-    minimum: 1
-    visible: ${deploy_compute}
-
+# spoke
+  compute_spoke_name:
     type: string
     required: true
-    description: "Virtual hard drive template for Hub private compute. Determines the operating system and other software for the machine."
-    visible: ${deploy_compute}
-    default: ocid1.image.oc1.uk-london-1.aaaaaaaakpa2zlibtjh5nrpaewb75k7pl3cy6oibq3hz7psm26uuiok56sfa
-
-    type: integer
-    required: true
-    description: "Boot Volume size in GiB for Hub private compute."
-    title: "Boot Volume Size - Hub, Private"
-    default: 64
-    maximum: 16384
-    minimum: 50
-    visible: ${deploy_compute}
-
-    type: string
-    required: true
-    description: "Subnet OCID for Hub private compute."
-    title: "Subnet OCID - Hub, Private"
-    visible:
-      and:
-        - not: 
-          - ${deploy_network}
-        - and:
-          - ${deploy_compute}
-
-    type: integer
-    required: true
-    description: "Number of nodes for Hub private compute."
-    title: "Number of Nodes - Hub, Private"
-    default: 1
-    minimum: 0
-    visible: ${deploy_compute}
-
-    type: oci:core:ssh:publickey
-    required: true
-    description: "SSH public key for Hub private compute."
-    title: "SSH Public Key - Hub, Private"
-    visible: ${deploy_compute}
-  # spoke compute
-  compute__name:
-    type: string
-    required: true
-    description: "String to use as part of Spoke compute resources' display names"
+    description: "Friendly string to include in spoke compute-layer resources' names."
     title: "Spoke Name"
-    default: student
+    default: jumpserver
     visible: ${deploy_compute}
-    # public
-  compute__availability_domain:
+  compute_spoke_availability_domain:
     type: enum
     enum:
       - 1
       - 2
       - 3
     required: true
-    description: "Availability Domain for Spoke public compute."
-    title: "Spoke AD - Public"
+    description: "Availability Domain (AD) for each spoke compute instance."
+    title: "Spoke AD"
     visible: ${deploy_compute}
-  compute__compartment_ocid:
+  compute_spoke_compartment_ocid:
     type: oci:identity:compartment:id
     required: true
-    description: "Compartment OCID for Spoke public compute."
-    title: "Spoke Compartment - Spoke, Public"
+    description: "Compartment OCID for each spoke compute instance."
+    title: "Spoke Compartment"
     visible: ${deploy_compute}
-  compute__shape:
+  compute_spoke_shape:
     type: enum
     enum:
       - "VM.Standard2.1"
@@ -481,171 +411,78 @@ variables:
       - "VM.Standard2.16"
       - "VM.Standard2.24"
       - "VM.Standard.E3.Flex"
+      - "VM.Standard.E4.Flex"
       - "BM.Standard2.52"
       - "BM.HPC2.36"
     required: true
-    description: "\"Weight class\" (e.g. CPUs, amount of memory, etc.) of your Spoke public compute."
-    title: "Spoke Shape - Spoke, Public"
+    description: "Template that specifies the amount of resources (e.g. CPUs, amount of memory, etc.) that are assigned to each spoke compute instance."
+    title: "Spoke Shape"
     default: "VM.Standard2.1"
     visible: ${deploy_compute}
-  compute__shape_config_memory_in_gbs:
+  compute_spoke_shape_config_memory_in_gbs:
     type: integer
     required: true
-    description: "Amount of memory in GiB for Spoke public compute. Customizable for flex shapes."
-    title: "Memory - Spoke, Public"
+    description: "Amount of memory in GiB for each Spoke compute instance."
+    title: "Spoke Memory"
     default: 256
     maximum: 1024
     minimum: 1
     visible:
       and:
         - eq:
-          - ${compute__shape}
+          - ${compute_spoke_shape}
           - "VM.Standard.E3.Flex"
-        - and:
-          - ${deploy_compute}
-  compute__shape_config_ocpus:
+          - "VM.Standard.E4.Flex"
+        - ${deploy_compute}
+  compute_spoke_shape_config_ocpus:
     type: integer
     required: true
-    description: "Number of OCPUs for Spoke public compute. Customizable for flex shapes."
-    title: "Number of OCPUs - Spoke, Public"
+    description: "Number of OCPUs for spoke compute instances."
+    title: "Spoke Number of OCPUs"
     default: 32
     maximum: 64
     minimum: 1
-    visible: ${deploy_compute}
-  compute__image_ocid:
+    visible:
+      and:
+          - eq:
+            - ${compute_spoke_shape}
+            - "VM.Standard.E3.Flex"
+            - "VM.Standard.E4.Flex"
+          - and:
+            - ${deploy_compute}
+  compute_spoke_image_ocid:
     type: string
     required: true
-    description: "Virtual hard drive template for Spoke public compute. Determines the operating system and other software for the machine."
+    description: "Oracle Cloud Identifier (OCID) that corresponds to a virtual hard drive template for spoke compute instances. Determines the operating system and other software for the machine. These OCIDs are typically region-specific."
     visible: ${deploy_compute}
-    default: ocid1.image.oc1.uk-london-1.aaaaaaaakpa2zlibtjh5nrpaewb75k7pl3cy6oibq3hz7psm26uuiok56sfa
-  compute__boot_volume_size_in_gbs:
+    default: ocid1.image.oc1..aaaaaaaatmfegrt4uzjgmcemh3vrk46f7ileqcfohhas56hi3pnjhp4nfhoq
+  compute_spoke_boot_volume_size_in_gbs:
     type: integer
     required: true
-    description: "Boot Volume size in GiB for Spoke public compute."
-    title: "Boot Volume Size - Spoke, Public"
+    description: "Boot Volume size in GiB for spoke compute instances."
+    title: "Spoke Boot Volume Size"
     default: 64
     maximum: 16384
     minimum: 50
     visible: ${deploy_compute}
-  compute__existing_subnet_ocid:
+  compute_spoke_existing_subnet_ocid:
     type: string
     required: true
-    description: "Subnet OCID for Spoke public compute."
-    title: "Subnet OCID - Spoke, Public"
+    description: "OCID that corresponds to an existing subnet in which spoke compute instances will be deployed."
+    title: "Spoke Existing Subnet"
     visible:
       and:
         - not: 
           - ${deploy_network}
         - and:
           - ${deploy_compute}
-  compute__num_nodes:
+    dependsOn:
+      compartmentID: ${compute_spoke_compartment_ocid}
+  compute_spoke_num_nodes:
     type: integer
     required: true
-    description: "Number of nodes for Spoke public compute."
-    title: "Number of Nodes - Spoke, Public"
-    default: 1
+    description: "How many compute instances will be deployed in each subnet of the spoke VCN?."
+    title: "Spoke Number of Nodes per Subnet"
+    default: 2
     minimum: 0
-    visible: ${deploy_compute}
-  compute__ssh_key:
-    type: oci:core:ssh:publickey
-    required: true
-    description: "SSH public key for Spoke public compute."
-    title: "SSH Public Key - Spoke, Public"
-    visible: ${deploy_compute}
-    # private
-
-    type: enum
-    enum:
-      - 1
-      - 2
-      - 3
-    required: true
-    description: "Availability Domain for Spoke private compute."
-    title: "Spoke AD - Private"
-    visible: ${deploy_compute}
-
-    type: oci:identity:compartment:id
-    required: true
-    description: "Compartment OCID for Spoke private compute."
-    title: "Spoke Compartment - Spoke, Private"
-    visible: ${deploy_compute}
-
-    type: enum
-    enum:
-      - "VM.Standard2.1"
-      - "VM.Standard2.2"
-      - "VM.Standard2.4"
-      - "VM.Standard2.8"
-      - "VM.Standard2.16"
-      - "VM.Standard2.24"
-      - "VM.Standard.E3.Flex"
-      - "BM.Standard2.52"
-      - "BM.HPC2.36"
-    required: true
-    description: "\"Weight class\" (e.g. CPUs, amount of memory, etc.) of your Spoke private compute."
-    title: "Spoke Shape - Spoke, Private"
-    visible: ${deploy_compute}
-
-    type: integer
-    required: true
-    description: "Amount of memory in GiB for Spoke private compute. Customizable for flex shapes."
-    title: "Memory - Spoke, Private"
-    default: 256
-    maximum: 1024
-    minimum: 1
-    visible:
-      and:
-        - eq:
-
-          - "VM.Standard.E3.Flex"
-        - and:
-          - ${deploy_compute}
-
-    type: integer
-    required: true
-    description: "Number of OCPUs for Spoke private compute. Customizable for flex shapes."
-    title: "Number of OCPUs - Spoke, Private"
-    default: 32
-    maximum: 64
-    minimum: 1
-    visible: ${deploy_compute}
-
-    type: string
-    required: true
-    description: "Virtual hard drive template for Spoke private compute. Determines the operating system and other software for the machine."
-    visible: ${deploy_compute}
-    default: ocid1.image.oc1..aaaaaaaabytdesc3bbtuvy2icnurcfmvcb7mgl2f35rfan5orn4y37q4mzta
-
-    type: integer
-    required: true
-    description: "Boot Volume size in GiB for Spoke private compute."
-    title: "Boot Volume Size - Spoke, Private"
-    default: 64
-    maximum: 16384
-    minimum: 50
-    visible: ${deploy_compute}
-
-    type: string
-    required: true
-    description: "Subnet OCID for Spoke private compute."
-    title: "Subnet OCID - Spoke, Private"
-    visible:
-      and:
-        - not: 
-          - ${deploy_network}
-        - and:
-          - ${deploy_compute}
-
-    type: integer
-    required: true
-    description: "Number of nodes for Spoke private compute."
-    title: "Number of Nodes - Spoke, Private"
-    default: 1
-    minimum: 0
-    visible: ${deploy_compute}
-
-    type: oci:core:ssh:publickey
-    required: true
-    description: "SSH public key for Spoke private compute."
-    title: "SSH Public Key - Spoke, Private"
     visible: ${deploy_compute}

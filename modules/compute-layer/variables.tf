@@ -6,6 +6,7 @@ locals {
   public = "pub"
   compute_instance = "compute"
   subnet = "sub"
+  # directory for newly generated private ssh keys
   ssh_keys_directory = "${path.root}/keys"
 }
 # outputs from network module
@@ -38,4 +39,3 @@ variable "compute_shape_config_ocpus" {}
 variable "compute_image_ocid" {}
 variable "compute_boot_volume_size_in_gbs" {}
 variable "compute_num_nodes" {}
-variable "compute_ssh_key" {}

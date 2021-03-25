@@ -2,9 +2,9 @@ module "network" {
   count = var.deploy_network == true ? 1 : 0
   source = "./modules/network-layer"
   # add another subnet?
-  add_subnet = var.add_subnet
+  add_subnet = local.add_subnet
   # subnet is public?
-  subnet_is_public = var.subnet_is_public
+  subnet_is_public = local.subnet_is_public
   # region
   region = var.region
   # hub variables
@@ -12,7 +12,7 @@ module "network" {
   network_hub_use_drg = var.network_hub_use_drg
   network_hub_cidr = var.network_hub_cidr
   # spoke variables
-  num_spoke_networks = var.num_spoke_networks
+  num_spoke_networks = local.num_spoke_networks
   network_spoke_use_sgw = var.network_spoke_use_sgw
   network_spoke_cidr_supernet = var.network_spoke_cidr_supernet
   network_spoke_cidr_supernet_newbits = var.network_spoke_cidr_supernet_newbits
@@ -30,14 +30,14 @@ module "compute" {
   # outputs from network module
   # hub
   hub_sub_ocids = var.deploy_network ? module.network[0].hub_sub_ocids : [local.compute_existing_subnet_ocid["hub"]]
-  hub_sub_display_names = var.deploy_network ? module.network[0].hub_sub_display_names : [random_id.hub_random.id] # OLD VALUE: [data.oci_core_subnet.compute_hub_existing_subnet.display_name]
-  hub_sub_are_private = var.deploy_network ? module.network[0].hub_sub_are_private : ["customsubnet"]
+  hub_sub_display_names = var.deploy_network ? module.network[0].hub_sub_display_names : [data.oci_core_subnet.compute_hub_existing_subnet[0].display_name]
+  hub_sub_are_private = var.deploy_network ? module.network[0].hub_sub_are_private : [data.oci_core_subnet.compute_hub_existing_subnet[0].prohibit_public_ip_on_vnic]
   # spoke
   spoke_sub_ocids = var.deploy_network ? module.network[0].spoke_sub_ocids : [local.compute_existing_subnet_ocid["spoke"]]
-  spoke_sub_display_names = var.deploy_network ? module.network[0].spoke_sub_display_names : [random_id.spoke_random.id] # OLD VALUE: [data.oci_core_subnet.compute_spoke_existing_subnet.display_name]
-  spoke_sub_are_private = var.deploy_network ? module.network[0].spoke_sub_are_private : ["customsubnet"] # OLD VALUE: [data.oci_core_subnet.compute_spoke_existing_subnet.prohibit_public_ip_on_vnic]
+  spoke_sub_display_names = var.deploy_network ? module.network[0].spoke_sub_display_names : [data.oci_core_subnet.compute_spoke_existing_subnet[0].display_name]
+  spoke_sub_are_private = var.deploy_network ? module.network[0].spoke_sub_are_private : [data.oci_core_subnet.compute_spoke_existing_subnet[0].prohibit_public_ip_on_vnic]
   # number of spoke networks
-  num_spoke_networks = var.num_spoke_networks
+  num_spoke_networks = local.num_spoke_networks
   # tenancy
   tenancy_ocid = var.tenancy_ocid
   # region
@@ -45,9 +45,9 @@ module "compute" {
   # deploy network?
   deploy_network = var.deploy_network
   # add another subnet?
-  add_subnet = var.add_subnet
+  add_subnet = local.add_subnet
   # subnet is public?
-  subnet_is_public = var.subnet_is_public
+  subnet_is_public = local.subnet_is_public
   # common variables
   network_name = local.network_name
   compute_name = local.compute_name
@@ -59,5 +59,4 @@ module "compute" {
   compute_image_ocid = local.compute_image_ocid
   compute_boot_volume_size_in_gbs = local.compute_boot_volume_size_in_gbs
   compute_num_nodes = local.compute_num_nodes
-  compute_ssh_key = local.compute_ssh_key
 }
