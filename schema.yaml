@@ -107,7 +107,23 @@ variables:
     default: 10.0.0.0/24
     visible: ${deploy_network}
   network_hub_num_network_partitions:
-    type: integer
+    type: enum
+    enum:
+    - 2 # this is the min number of partitions we can make in a VCN so that CIDR ranges can be defined for our minimum number of 2 subnets (1 X public + 1 X private) per VCN in this project.
+    - 4
+    - 8
+    - 16
+    - 32
+    - 64
+    - 128
+    - 256
+    - 512
+    - 1024
+    - 2048
+    - 4096
+    - 8192
+    - 16384
+    - 32768 # this is the max number of partitions we can make in a /16 VCN (largest VCN you can make in OCI) so that CIDR ranges can be defined for our minimum number of 2 subnets (1 X public + 1 X private) per VCN in this project.
     required: true
     description: "Number of partitions to divide the hub VCN CIDR into. This will influence the size of any subnets deployed in the hub VCN."
     title: "Number of Network Partitions for Hub VCN"
