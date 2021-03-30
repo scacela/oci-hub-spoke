@@ -87,9 +87,7 @@ variables:
     default: true
 # hub
   network_hub_compartment_ocid:
-    # type: oci:identity:compartment:id
-    type: string
-    default: ocid1.compartment.oc1..aaaaaaaakhkm2aq7ycoipubh4rhkdhv7ktgoulwuwwltcivv2vtu5qvum72q
+    type: oci:identity:compartment:id
     required: true
     description: "Deploy hub network in which compartment?"
     title: "Hub Compartment"
@@ -166,9 +164,7 @@ variables:
     minimum: 0
     visible: ${deploy_network}
   network_spoke_compartment_ocid:
-    # type: oci:identity:compartment:id
-    type: string
-    default: ocid1.compartment.oc1..aaaaaaaakhkm2aq7ycoipubh4rhkdhv7ktgoulwuwwltcivv2vtu5qvum72q
+    type: oci:identity:compartment:id
     required: true
     description: "Deploy spoke network in which compartment?"
     title: "Spoke Compartment"
@@ -283,9 +279,7 @@ variables:
     title: "Hub AD"
     visible: ${deploy_compute}
   compute_hub_compartment_ocid:
-    # type: oci:identity:compartment:id
-    type: string
-    default: ocid1.compartment.oc1..aaaaaaaakhkm2aq7ycoipubh4rhkdhv7ktgoulwuwwltcivv2vtu5qvum72q
+    type: oci:identity:compartment:id
     required: true
     description: "Compartment OCID for each hub compute instance."
     title: "Hub Compartment"
@@ -396,9 +390,7 @@ variables:
     title: "Spoke AD"
     visible: ${deploy_compute}
   compute_spoke_compartment_ocid:
-    # type: oci:identity:compartment:id
-    type: string
-    default: ocid1.compartment.oc1..aaaaaaaakhkm2aq7ycoipubh4rhkdhv7ktgoulwuwwltcivv2vtu5qvum72q
+    type: oci:identity:compartment:id
     required: true
     description: "Compartment OCID for each spoke compute instance."
     title: "Spoke Compartment"
