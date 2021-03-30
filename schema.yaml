@@ -450,11 +450,11 @@ variables:
         - and:
           or:
             - eq:
-              - ${compute_hub_shape}
+              - ${compute_spoke_shape}
               - "VM.Standard.E3.Flex"
             - or:
               - eq:
-                - ${compute_hub_shape}
+                - ${compute_spoke_shape}
                 - "VM.Standard.E4.Flex"
   compute_spoke_shape_config_ocpus:
     type: integer
