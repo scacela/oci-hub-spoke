@@ -48,22 +48,22 @@ vi env.sh
 <pre>
 source env.sh
 </pre>
-3. Open the files of prefix 'variables-' at the base directory and edit the default values of the objects of type 'variable', which will influence the stack topology according to your preferences.
+5. Open the files of prefix 'variables-' at the base directory and edit the default values of the objects of type 'variable', which will influence the stack topology according to your preferences.
 <pre>
 vi variables-common.tf
 vi variables-compute.tf
 vi variables-network.tf
 </pre>
-5. Initialize your Terraform project, downloading necessary packages for the deployment.
+6. Initialize your Terraform project, downloading necessary packages for the deployment.
 <pre>
 terraform init
 </pre>
-6. View the plan of the Terraform deployment, and confirm that the changes described in the plan reflect the changes you wish to make in your OCI environment.
+7. View the plan of the Terraform deployment, and confirm that the changes described in the plan reflect the changes you wish to make in your OCI environment.
 <pre>
 terraform plan
 </pre>
-7. Apply the changes described in the plan, and answer yes when prompted for confirmation.
+8. Apply the changes described in the plan, and answer yes when prompted for confirmation.
 <pre>
 terraform apply
 </pre>
-8. You can track the logs associated with the job by monitoring the output on the CLI. After the deployment has finished, review the output information at the bottom of the logs for instructions on how to access the nodes in the topology.
+9. You can track the logs associated with the job by monitoring the output on the CLI. After the deployment has finished, review the output information at the bottom of the logs for instructions on how to access the nodes in the topology.
