@@ -1,5 +1,5 @@
 # oci-hub-spoke
-## Deploy and manage the network and compute layers of a hub-spoke topology using Terraform
+## Deploy and manage the network and compute layers of a hub-and-spoke topology using Terraform
 
 ### Workshop Prerequisites
 - Access to an OCI Tenancy (account)
