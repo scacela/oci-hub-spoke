@@ -15,6 +15,7 @@ Hamburger Menu &gt Governance &gt Limits, Quotas and Usage
 </pre>
 
 ### Deployment via Resource Manager
+##### Recommended for first time users of this project. The 'Configure Variables' page in Resource Manager helps users provide valid input.
 1. Navigate to [cloud.oracle.com](https://cloud.oracle.com/) on a web browser.
 2. Sign into OCI.
 3. Click the hamburger icon.
