@@ -15,7 +15,7 @@ Hamburger Menu &gt Governance &gt Limits, Quotas and Usage
 </pre>
 
 ### Deployment via Resource Manager
-1. Navigate to [cloud.oracle.com](https://cloud.oracle.com/) on a web browser.
+1. Navigate to [cloud.oracle.com](https://cloud.oracle.com/){:target="_blank"} on a web browser.
 2. Sign into OCI
 3. Click the hamburger icon
 4. Hover over 'Resource Manager' from the dropdown menu, and click 'Stacks'
