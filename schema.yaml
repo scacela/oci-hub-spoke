@@ -322,7 +322,6 @@ variables:
               - eq:
                 - ${compute_hub_shape}
                 - "VM.Standard.E4.Flex"
-          
   compute_hub_shape_config_ocpus:
     type: integer
     required: true
