@@ -39,7 +39,7 @@ Hamburger Menu &gt Governance &gt Limits, Quotas and Usage
 2. [Set up CLI Terraform on your local machine.](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/terraformgetstarted.htm) 
 3. Navigate to project folder on your local machine via CLI.
 <pre>
-cd YOUR_PATH/oci-hub-spoke
+cd YOUR_PATH_TO_THIS_PROJECT
 </pre>
 4. Open env.sh and edit the variables of prefix 'TF_VAR_', which will influence the stack topology according to your preferences.
 <pre>
