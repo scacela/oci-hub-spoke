@@ -19,7 +19,7 @@ resource "null_resource" "set_permissions" {
     count = var.compute_num_nodes["hub"] > 0 ? 1 : 0
     provisioner "remote-exec" {
         inline = [
-          "sudo chmod 600 ${local.ssh_keys_dir_path}/*",
+          "chmod 600 ${local.ssh_keys_dir_path}/*",
         ]
     }
     connection {
