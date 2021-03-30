@@ -7,7 +7,9 @@ locals {
   compute_instance = "compute"
   subnet = "sub"
   # directory for newly generated private ssh keys
-  ssh_keys_directory = "${path.root}/keys"
+  ssh_keys_dir_path = "~/keys"
+  # directory for host ips
+  host_file_path = "~/hosts"
 }
 # outputs from network module
 variable "hub_sub_ocids" {}

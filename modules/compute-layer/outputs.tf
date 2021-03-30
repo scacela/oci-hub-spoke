@@ -16,6 +16,9 @@ output "hub_info" {
 output "spoke_info" {
   value = local.spoke
 }
-output "ssh_keys_directory" {
-  value = local.ssh_keys_directory
+output "ssh_keys_dir_path" {
+  value = local.ssh_keys_dir_path
+}
+output "ssh_key" {
+  value = tls_private_key.hub_key[0].private_key_pem
 }

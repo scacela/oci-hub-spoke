@@ -1,5 +1,5 @@
 module "network" {
-  count = var.deploy_network == true ? 1 : 0
+  count = var.deploy_network ? 1 : 0
   source = "./modules/network-layer"
   # add another subnet?
   add_subnet = local.add_subnet
@@ -25,7 +25,7 @@ module "network" {
 
 module "compute" {
   depends_on = [ module.network ]
-  count = var.deploy_compute == true ? 1 : 0
+  count = var.deploy_compute ? 1 : 0
   source = "./modules/compute-layer"
   # outputs from network module
   # hub

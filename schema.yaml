@@ -87,12 +87,13 @@ variables:
     default: true
 # hub
   network_hub_compartment_ocid:
-    type: oci:identity:compartment:id
+    # type: oci:identity:compartment:id
+    type: string
+    default: ocid1.compartment.oc1..aaaaaaaakhkm2aq7ycoipubh4rhkdhv7ktgoulwuwwltcivv2vtu5qvum72q
     required: true
     description: "Deploy hub network in which compartment?"
     title: "Hub Compartment"
     visible: ${deploy_network}
-    default: samuel
   network_hub_name:
     type: string
     required: true
@@ -165,12 +166,13 @@ variables:
     minimum: 0
     visible: ${deploy_network}
   network_spoke_compartment_ocid:
-    type: oci:identity:compartment:id
+    # type: oci:identity:compartment:id
+    type: string
+    default: ocid1.compartment.oc1..aaaaaaaakhkm2aq7ycoipubh4rhkdhv7ktgoulwuwwltcivv2vtu5qvum72q
     required: true
     description: "Deploy spoke network in which compartment?"
     title: "Spoke Compartment"
     visible: ${deploy_network}
-    default: samuel
   network_spoke_name:
     type: string
     required: true
@@ -281,12 +283,13 @@ variables:
     title: "Hub AD"
     visible: ${deploy_compute}
   compute_hub_compartment_ocid:
-    type: oci:identity:compartment:id
+    # type: oci:identity:compartment:id
+    type: string
+    default: ocid1.compartment.oc1..aaaaaaaakhkm2aq7ycoipubh4rhkdhv7ktgoulwuwwltcivv2vtu5qvum72q
     required: true
     description: "Compartment OCID for each hub compute instance."
     title: "Hub Compartment"
     visible: ${deploy_compute}
-    default: samuel
   compute_hub_shape:
     type: enum
     enum:
@@ -393,12 +396,13 @@ variables:
     title: "Spoke AD"
     visible: ${deploy_compute}
   compute_spoke_compartment_ocid:
-    type: oci:identity:compartment:id
+    # type: oci:identity:compartment:id
+    type: string
+    default: ocid1.compartment.oc1..aaaaaaaakhkm2aq7ycoipubh4rhkdhv7ktgoulwuwwltcivv2vtu5qvum72q
     required: true
     description: "Compartment OCID for each spoke compute instance."
     title: "Spoke Compartment"
     visible: ${deploy_compute}
-    default: samuel
   compute_spoke_shape:
     type: enum
     enum:
