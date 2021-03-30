@@ -312,12 +312,17 @@ variables:
     minimum: 1
     visible:
       and:
-        - eq:
-          - ${compute_hub_shape}
-          or:
-            - "VM.Standard.E3.Flex"
-            - "VM.Standard.E4.Flex"
         - ${deploy_compute}
+        - and:
+          or:
+            - eq:
+              - ${compute_hub_shape}
+              - "VM.Standard.E3.Flex"
+            - or:
+              - eq:
+                - ${compute_hub_shape}
+                - "VM.Standard.E4.Flex"
+          
   compute_hub_shape_config_ocpus:
     type: integer
     required: true
@@ -328,13 +333,16 @@ variables:
     minimum: 1
     visible:
       and:
-          - eq:
-            - ${compute_hub_shape}
-            or:
-            - "VM.Standard.E3.Flex"
-            - "VM.Standard.E4.Flex"
-          - and:
-            - ${deploy_compute}
+        - ${deploy_compute}
+        - and:
+          or:
+            - eq:
+              - ${compute_hub_shape}
+              - "VM.Standard.E3.Flex"
+            - or:
+              - eq:
+                - ${compute_hub_shape}
+                - "VM.Standard.E4.Flex"
   compute_hub_image_ocid:
     type: string
     required: true
@@ -423,12 +431,16 @@ variables:
     minimum: 1
     visible:
       and:
-        - eq:
-          - ${compute_spoke_shape}
-          or:
-            - "VM.Standard.E3.Flex"
-            - "VM.Standard.E4.Flex"
         - ${deploy_compute}
+        - and:
+          or:
+            - eq:
+              - ${compute_hub_shape}
+              - "VM.Standard.E3.Flex"
+            - or:
+              - eq:
+                - ${compute_hub_shape}
+                - "VM.Standard.E4.Flex"
   compute_spoke_shape_config_ocpus:
     type: integer
     required: true
@@ -439,13 +451,16 @@ variables:
     minimum: 1
     visible:
       and:
-          - eq:
-            - ${compute_spoke_shape}
-            or:
-            - "VM.Standard.E3.Flex"
-            - "VM.Standard.E4.Flex"
-          - and:
-            - ${deploy_compute}
+        - ${deploy_compute}
+        - and:
+          or:
+            - eq:
+              - ${compute_hub_shape}
+              - "VM.Standard.E3.Flex"
+            - or:
+              - eq:
+                - ${compute_hub_shape}
+                - "VM.Standard.E4.Flex"
   compute_spoke_image_ocid:
     type: string
     required: true
