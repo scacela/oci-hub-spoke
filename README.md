@@ -16,17 +16,17 @@ Hamburger Menu &gt Governance &gt Limits, Quotas and Usage
 
 ### Deployment via Resource Manager
 1. Navigate to [cloud.oracle.com](https://cloud.oracle.com/) on a web browser.
-2. Sign into OCI
-3. Click the hamburger icon
-4. Hover over 'Resource Manager' from the dropdown menu, and click 'Stacks'
-5. Under 'List Scope', Select the Compartment where you wish to create the stack
-6. Click 'Create Stack'
+2. Sign into OCI.
+3. Click the hamburger icon.
+4. Hover over 'Resource Manager' from the dropdown menu, and click 'Stacks'.
+5. Under 'List Scope', Select the Compartment where you wish to create the stack.
+6. Click 'Create Stack'.
 7. On the 'Stack Information' page, under 'Stack Configuration', browse for and select the this project folder from your local machine.
-8. Click 'Next'
+8. Click 'Next'.
 9. On the 'Configure Variables' page, edit the variables that will influence the stack topology according to your preferences.
-10. Click 'Next'
+10. Click 'Next'.
 11. On the 'Review' page, review your choices for the stack deployment.
-12. Click 'Create'
+12. Click 'Create'.
 13. Click 'Terraform Actions' > 'Apply' > 'Apply'.
 14. You can track the logs associated with the job by clicking Jobs > Logs. After the deployment has finished, review the output information at the bottom of the logs for instructions on how to access the nodes in the topology. You can also find outputs at Jobs > Outputs.
 
@@ -47,7 +47,7 @@ vi env.sh
 <pre>
 source env.sh
 </pre>
-5. Initialize your Terraform project, downloading necessary packages for the deployment
+5. Initialize your Terraform project, downloading necessary packages for the deployment.
 <pre>
 terraform init
 </pre>
