@@ -1,9 +1,9 @@
 # oci-hub-spoke
-### Deploy and manage the network and compute layers of a hub-spoke topology using Terraform
+## Deploy and manage the network and compute layers of a hub-spoke topology using Terraform
 
 ### Workshop Prerequisites
 - Access to an OCI Tenancy (account)
-- OCI Policies
+- OCI Policies:
 <pre>
 Allow group GROUPNAME to manage instance-family in compartment COMPARTMENTNAME
 Allow group GROUPNAME to manage virtual-network-family in compartment COMPARTMENTNAME
