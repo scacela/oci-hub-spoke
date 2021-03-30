@@ -48,6 +48,12 @@ vi env.sh
 <pre>
 source env.sh
 </pre>
+3. Open the files of prefix 'variables-' at the base directory and edit the default values of the objects of type 'variable', which will influence the stack topology according to your preferences.
+<pre>
+vi variables-common.tf
+vi variables-compute.tf
+vi variables-network.tf
+</pre>
 5. Initialize your Terraform project, downloading necessary packages for the deployment.
 <pre>
 terraform init
