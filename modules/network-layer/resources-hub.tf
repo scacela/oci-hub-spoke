@@ -38,9 +38,9 @@ resource "oci_core_route_table" "network_hub_rt" {
   }
   # ngw
   dynamic route_rules {
-    for_each = (count.index == 0 || var.subnet_is_public["hub_b"]) && var.network_use_ngw["hub"] ? [] : [1]
+    for_each = (count.index == 0 || ! var.subnet_is_public["hub_b"]) && var.network_use_ngw["hub"] ? [] : [1]
     content {
-      network_entity_id = oci_core_nat_gateway.network_hub_ngw[count.index%(var.add_subnet["hub"] ? 2 : 1)].id
+      network_entity_id = oci_core_nat_gateway.network_hub_ngw[0].id
       destination       = "0.0.0.0/0"
       destination_type  = "CIDR_BLOCK"
     }

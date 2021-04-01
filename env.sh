@@ -1,3 +1,6 @@
+# set   TF_VAR_ variables: $ source env.sh
+# unset TF_VAR_ variables: $ unset ${!TF_VAR_@}
+
 # only used as auth variables
 export TF_VAR_fingerprint=FINGERPRINT # replace
 export TF_VAR_user_ocid=USER_OCID # replace
