@@ -60,18 +60,17 @@ resource "null_resource" "hub_key" {
 }
 # hosts file gets deployed to hub computes
 resource "null_resource" "host_file" {
-    # depends_on = [oci_core_instance.hub_compute] # might be necessary for case when deployed to new network, then re-deployed with deploy_network == false to an existing subnet. This depends_on could make the difference between the hosts file being deployed vs. not to the new compute.
-    count = (var.add_subnet["hub"] ? 2 : 1) * var.compute_num_nodes["hub"]
+    count = (var.add_subnet["hub"] && var.subnet_is_public["hub_b"] ? 2 : 1) * var.compute_num_nodes["hub"]
     provisioner "file" {
     content = templatefile("${path.module}/hosts.tpl", {
       spoke_displaynames_and_privateips = zipmap(local.spoke["display_names"], local.spoke["private_ips"])
       })
     destination = local.host_file_path
     connection {
-      host        = oci_core_instance.hub_compute[count.index].public_ip
+      host        = oci_core_instance.hub_compute[(! var.subnet_is_public["hub_b"]) && var.add_subnet["hub"] ? count.index*2 : count.index].public_ip
       type        = "ssh"
       user        = "opc"
-      private_key = tls_private_key.hub_key[count.index].private_key_pem
+      private_key = tls_private_key.hub_key[(! var.subnet_is_public["hub_b"]) && var.add_subnet["hub"] ? count.index*2 : count.index].private_key_pem
     }
   }
 }
