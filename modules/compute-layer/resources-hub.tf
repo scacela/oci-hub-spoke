@@ -63,6 +63,7 @@ resource "null_resource" "host_file" {
     count = (var.add_subnet["hub"] && var.subnet_is_public["hub_b"] ? 2 : 1) * var.compute_num_nodes["hub"]
     provisioner "file" {
     content = templatefile("${path.module}/hosts.tpl", {
+      hub_displaynames_and_privateips = zipmap(local.hub["display_names"], local.hub["private_ips"])
       spoke_displaynames_and_privateips = zipmap(local.spoke["display_names"], local.spoke["private_ips"])
       })
     destination = local.host_file_path
